@@ -1,76 +1,63 @@
-import React, { useState, useEffect } from 'react';
+// src/components/ProductList.jsx
 
-const ProductList = ({ filters }) => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+import React, { useState } from 'react';
+import { Loader } from 'lucide-react';
+
+const placeholderImage = '/Users/latchy/OrielSkinToneAnalyzer/client/src/assets/AiGucciman.jpg';
+
+const ProductImage = ({ src, alt }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    if (products.length > 0) {
-      applyFilters();
-    }
-  }, [filters, products]);
-
-  const fetchProducts = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('http://makeup-api.herokuapp.com/api/v1/products.json');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setProducts(data);
-      setFilteredProducts(data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Failed to fetch products. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
-    let result = products;
-
-    if (filters.brand) {
-      result = result.filter(product => product.brand && product.brand.toLowerCase() === filters.brand.toLowerCase());
-    }
-
-    if (filters.product_type) {
-      result = result.filter(product => product.product_type && product.product_type.toLowerCase() === filters.product_type.toLowerCase());
-    }
-
-    if (filters.tag) {
-      result = result.filter(product =>
-        product.tag_list && Array.isArray(product.tag_list) && product.tag_list.some(tag => tag.toLowerCase() === filters.tag.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(result);
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (!src) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="relative mt-2 w-full h-48 overflow-hidden rounded-lg shadow-md">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-pink-200 to-orange-200">
+          <Loader className="animate-spin text-pink-500" size={24} />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt || 'Product Image'}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        onLoad={() => setIsLoading(false)}
+        onError={(e) => {
+          setIsLoading(false);
+          setError(true);
+          e.target.onerror = null;
+          e.target.src = placeholderImage;
+        }}
+      />
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-pink-200 to-orange-200 text-pink-600">
+          Image not available
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ProductList = ({ products, filters }) => {
+  const filteredProducts = products.filter(product => {
+    if (!product || !product.image_link) return false;
+    const brandMatch = !filters.brand || (product.brand && product.brand.toLowerCase() === filters.brand.toLowerCase());
+    const typeMatch = !filters.product_type || (product.product_type && product.product_type.toLowerCase() === filters.product_type.toLowerCase());
+    return brandMatch && typeMatch;
+  });
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredProducts.map(product => (
-        <div key={product.id} className="border p-4 rounded-lg">
-          <img src={product.image_link} alt={product.name} className="w-full h-48 object-cover mb-2" />
-          <h3 className="font-bold">{product.name || 'Unnamed Product'}</h3>
-          <p>{product.brand || 'Unknown Brand'}</p>
-          <p>${product.price || 'N/A'}</p>
+        <div key={product.id} className="bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105">
+          <ProductImage src={product.image_link} alt={product.name} />
+          <div className="p-4">
+            <h3 className="font-bold text-lg text-pink-600 mb-2">{product.name || 'Unnamed Product'}</h3>
+            <p className="text-sm text-gray-600 mb-1">Brand: <span className="font-semibold text-orange-500">{product.brand || 'Unknown'}</span></p>
+            <p className="text-sm text-gray-600 mb-1">Price: <span className="font-semibold text-green-500">${product.price || 'N/A'}</span></p>
+            <p className="text-sm text-gray-600">Category: <span className="font-semibold text-purple-500">{product.category || 'N/A'}</span></p>
+          </div>
         </div>
       ))}
     </div>

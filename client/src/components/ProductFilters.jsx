@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Filter, ChevronDown } from 'lucide-react';
 
 const ProductFilters = ({ onFilter }) => {
   const [brand, setBrand] = useState('');
@@ -36,58 +37,62 @@ const ProductFilters = ({ onFilter }) => {
     "Lip liner", "Lipstick", "Mascara", "Nail polish"
   ];
 
+  const SelectInput = ({ label, value, onChange, options, id }) => (
+    <div className="relative">
+      <label htmlFor={id} className="block text-sm font-medium text-pink-600 mb-1">{label}</label>
+      <select
+        id={id}
+        value={value}
+        onChange={onChange}
+        className="block w-full pl-3 pr-10 py-2 text-base text-gray-700 bg-white bg-opacity-80 border-2 border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent rounded-full appearance-none transition duration-300 ease-in-out shadow-sm hover:shadow-md"
+      >
+        <option value="">All {label}s</option>
+        {options.map((option) => (
+          <option key={option} value={option.toLowerCase()}>{option}</option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-pink-500">
+        <ChevronDown size={20} />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="mb-4 space-y-2">
-      <div>
-        <label htmlFor="brand-select" className="block text-sm font-medium text-gray-700">Brand</label>
-        <select
-          id="brand-select"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
-        >
-          <option value="">All Brands</option>
-          {brands.map((b) => (
-            <option key={b} value={b.toLowerCase()}>{b}</option>
-          ))}
-        </select>
-      </div>
+    <div className="mb-6 space-y-4 bg-gradient-to-r from-pink-100 to-orange-100 p-6 rounded-2xl shadow-lg">
+      <h3 className="text-xl font-bold text-pink-600 mb-4 flex items-center">
+        <Filter className="mr-2" size={24} />
+        Island Vibes Filter
+      </h3>
 
-      <div>
-        <label htmlFor="product-type-select" className="block text-sm font-medium text-gray-700">Product Type</label>
-        <select
-          id="product-type-select"
-          value={productType}
-          onChange={(e) => setProductType(e.target.value)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
-        >
-          <option value="">All Types</option>
-          {productTypes.map((type) => (
-            <option key={type} value={type.toLowerCase()}>{type}</option>
-          ))}
-        </select>
-      </div>
+      <SelectInput
+        label="Brand"
+        value={brand}
+        onChange={(e) => setBrand(e.target.value)}
+        options={brands}
+        id="brand-select"
+      />
 
-      <div>
-        <label htmlFor="tag-select" className="block text-sm font-medium text-gray-700">Tag</label>
-        <select
-          id="tag-select"
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
-        >
-          <option value="">All Tags</option>
-          {tags.map((t) => (
-            <option key={t} value={t.toLowerCase()}>{t}</option>
-          ))}
-        </select>
-      </div>
+      <SelectInput
+        label="Product Type"
+        value={productType}
+        onChange={(e) => setProductType(e.target.value)}
+        options={productTypes}
+        id="product-type-select"
+      />
+
+      <SelectInput
+        label="Tag"
+        value={tag}
+        onChange={(e) => setTag(e.target.value)}
+        options={tags}
+        id="tag-select"
+      />
 
       <button
         onClick={handleFilter}
-        className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white px-6 py-3 rounded-full hover:from-pink-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg font-bold text-lg"
       >
-        Apply Filters
+        Find Your Island Glow
       </button>
     </div>
   );
