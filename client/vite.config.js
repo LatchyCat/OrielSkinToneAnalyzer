@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: 'https://latchycat.github.io/OrielSkinToneAnalyzer/', // Replace with your GitHub repository name
+  base: '/OrielSkinToneAnalyzer/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
